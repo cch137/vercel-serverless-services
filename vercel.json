@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "functions": {
     "api/**/*": {
-      "maxDuration": 900
+      "maxDuration": 60
     }
   }
 }
