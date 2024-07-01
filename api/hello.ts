@@ -8,7 +8,7 @@ export default (() => {
       .collection("x-users")
       .findOne({ name: "cch137" });
     return res.json({
-      user,
+      // user,
     });
   };
 })();
