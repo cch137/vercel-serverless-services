@@ -4,23 +4,8 @@ export default async function handler1(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // CORS
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  // res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-  );
-  if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-
+  if (req.method === "OPTIONS")
+    return res.setHeader("Access-Control-Allow-Origin", "*").status(200).end();
   const [input, init] = typeof req.body === "string" ? [req.body] : req.body;
   if (typeof input !== "string") return res.status(400).end();
   if (init && typeof init !== "object") return res.status(400).end();
@@ -33,6 +18,7 @@ export default async function handler1(
       if (/set-cookie/i.test(k)) k = `proxy-${k}`;
       res.appendHeader(k, v);
     });
+    res.setHeader("Access-Control-Allow-Origin", "*");
     const reader = proxyRes.body?.getReader();
     if (!reader) return res.end();
     while (true) {
