@@ -8,10 +8,7 @@ const cors = (res: VercelResponse) => {
   return res;
 };
 
-export default async function handler1(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return cors(res).status(200).end();
   const [input, init] = typeof req.body === "string" ? [req.body] : req.body;
   if (!input || typeof input !== "string") return res.status(400).end();
