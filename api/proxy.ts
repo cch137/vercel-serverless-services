@@ -14,19 +14,19 @@ export default async function handler1(
 ) {
   if (req.method === "OPTIONS") return cors(res).status(200).end();
   const [input, init] = typeof req.body === "string" ? [req.body] : req.body;
-  if (typeof input !== "string") return res.status(400).end();
+  if (!input || typeof input !== "string") return res.status(400).end();
   if (init && typeof init !== "object") return res.status(400).end();
   try {
-    const proxyRes = await fetch(input, init);
-    res.status(proxyRes.status).statusMessage ||= proxyRes.statusText;
-    proxyRes.headers.forEach((v, k) => {
+    const proxied = await fetch(input, init);
+    res.status(proxied.status).statusMessage ||= proxied.statusText;
+    proxied.headers.forEach((v, k) => {
       if (/content-length/i.test(k)) return;
       if (/content-encoding/i.test(k)) return;
       if (/set-cookie/i.test(k)) k = `proxy-${k}`;
       res.appendHeader(k, v);
     });
     cors(res);
-    const reader = proxyRes.body?.getReader();
+    const reader = proxied.body?.getReader();
     if (!reader) return res.end();
     while (true) {
       const { value, done } = await reader.read();
@@ -35,7 +35,9 @@ export default async function handler1(
     }
     res.end();
   } catch (err) {
-    console.error(err);
-    res.status(500).send(err instanceof Error ? err.message : err);
+    cors(res)
+      .status(500)
+      .setHeader("Content-Type", "text/plain")
+      .setHeader("Error", err instanceof Error ? err.message : String(err));
   }
 }
