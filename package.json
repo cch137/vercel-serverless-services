@@ -9,7 +9,7 @@
     "vercel": "^35.1.0"
   },
   "scripts": {
-    "test": "vercel dev",
+    "test": "vercel dev -p 5000",
     "build": "tsc"
   }
 }
