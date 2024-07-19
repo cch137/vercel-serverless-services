@@ -26,6 +26,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res
       .status(500)
       .setHeader("Content-Type", "text/plain")
-      .setHeader("Error", err instanceof Error ? err.message : String(err));
+      .send(err instanceof Error ? err.message : String(err));
   }
 }
