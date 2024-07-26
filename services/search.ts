@@ -85,18 +85,16 @@ function googleExtractText(
   }
 }
 
-export function googleSearchSummaryV2(query: string): Promise<string>;
-export function googleSearchSummaryV2(queries: string[]): Promise<string>;
-export function googleSearchSummaryV2(
+export function googleSearchToTextV2(query: string): Promise<string>;
+export function googleSearchToTextV2(queries: string[]): Promise<string>;
+export function googleSearchToTextV2(
   queries: string | string[]
 ): Promise<string>;
-export async function googleSearchSummaryV2(
-  ..._queries: (string[] | string)[]
-) {
+export async function googleSearchToTextV2(..._queries: (string[] | string)[]) {
   const queries = _queries.flat(1);
   if (queries.length !== 1)
     return (
-      await Promise.all(queries.map((q) => googleSearchSummaryV2(q)))
+      await Promise.all(queries.map((q) => googleSearchToTextV2(q)))
     ).flat();
   const query = queries[0];
 
