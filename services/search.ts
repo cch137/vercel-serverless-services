@@ -100,7 +100,7 @@ export async function googleSearchSummaryV2(
     ).flat();
   const query = queries[0];
 
-  const res = await proFetch(`https://www.google.com.sg/search?q=${query}`);
+  const res = await proFetch(`https://www.google.com/search?q=${query}`);
   const $ = cheerioLoad(await res.text());
   const items = [...$("#main").children("div")];
   const text = items
