@@ -9,6 +9,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .setHeader("Content-Type", "text/plain")
       .send(`1 ${from} = ${await exchangeCurrency(from, to)} ${to}`);
   } catch {
-    res.status(500);
+    res.status(500).end();
   }
 }

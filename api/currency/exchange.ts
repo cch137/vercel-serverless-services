@@ -7,6 +7,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const to = req.query["to"] || req.body["to"];
     res.json(await exchangeCurrency(from, to));
   } catch {
-    res.status(500);
+    res.status(500).end();
   }
 }
