@@ -1,11 +1,14 @@
 {
   "dependencies": {
+    "@cch137/read-stream": "^0.1.1",
     "@vercel/node": "^3.2.3",
     "cheerio": "^1.0.0-rc.12",
+    "qs": "^6.12.3",
     "typescript": "^5.5.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
+    "@types/qs": "^6.9.15",
     "vercel": "^35.1.0"
   },
   "scripts": {
