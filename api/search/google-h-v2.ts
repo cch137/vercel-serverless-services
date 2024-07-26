@@ -6,7 +6,7 @@ export default async function searchResultsH(
   res: VercelResponse
 ) {
   try {
-    const query = req.query["query"] || req.body["query"];
+    const query = req.query["query"] || req.body?.["query"];
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.send(await googleSearchToTextV2(query));
   } catch {

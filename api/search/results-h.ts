@@ -7,9 +7,9 @@ export default async function searchResultsH(
   res: VercelResponse
 ) {
   try {
-    const query = req.query["query"] || req.body["query"];
-    const engine = req.query["engine"] || req.body["engine"];
-    const url = Booleanish(req.query["url"] || req.body["url"]);
+    const query = req.query["query"] || req.body?.["query"];
+    const engine = req.query["engine"] || req.body?.["engine"];
+    const url = Booleanish(req.query["url"] || req.body?.["url"]);
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.send(await searchToText(query, { engine, url }));
   } catch {
