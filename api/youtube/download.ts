@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     req.body?.["source"];
   const id = req.query["id"] || req.body?.["id"];
   const downloadId = req.query["d"] || req.body?.["d"];
-  let format = req.query["f"] || req.body?.["f"];
+  let format = req.query["f"] || req.body?.["f"] || "mp3";
   let filename = req.query["filename"] || req.body?.["filename"];
 
   if (downloadId && typeof downloadId === "string") {
