@@ -1,5 +1,6 @@
-import { search } from "../../services/search";
+import { search, searchToText } from "../../services/search";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { Booleanish } from "../../services/utils";
 
 export default async function searchResults(
   req: VercelRequest,
@@ -8,7 +9,15 @@ export default async function searchResults(
   try {
     const query = req.query["query"] || req.body?.["query"];
     const engine = req.query["engine"] || req.body?.["engine"];
-    res.json(await search(query, { engine }));
+    const human = Booleanish(req.query["h"] || req.body?.["h"]);
+    const url = Booleanish(req.query["url"] || req.body?.["url"]);
+
+    if (human) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.send(await searchToText(query, { engine, url }));
+    } else {
+      res.json(await search(query, { engine }));
+    }
   } catch {
     res.status(500).end();
   }

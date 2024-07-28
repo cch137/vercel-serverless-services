@@ -14,12 +14,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     req.query["source"] ||
     req.body?.["source"];
   const id = req.query["id"] || req.body?.["id"];
+  const download = req.query["dl"] || req.body?.["dl"];
+  let filename = req.query["filename"] || req.body?.["filename"];
+
+  if (
+    download &&
+    typeof download === "string" &&
+    filename &&
+    typeof filename !== "string"
+  ) {
+    const filepath = `public/ytdl-cache/${download}/${filename}.mp4`;
+
+    if (!fs.existsSync(filepath) || !fs.statSync(filepath).isFile())
+      return res.status(404).end();
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(filename)}"`
+    );
+    res.setHeader("Content-Type", "video/mp4");
+
+    fs.createReadStream(filepath).pipe(res);
+
+    return;
+  }
 
   const source = _source || (id ? `https://youtu.be/${id}` : null);
 
   if (!source || typeof source !== "string") return res.status(400).end();
-
-  let filename = req.query["filename"] || req.body?.["filename"];
 
   if (!filename || typeof filename !== "string") {
     const info = await YTDL.info(source);
@@ -39,9 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     YTDL.mp4(source, { output: cacheFilepath })
       .stream.on("close", () => {
         res.redirect(
-          `/api/youtube/mp4-download?filename=${encodeURIComponent(
-            filename
-          )}&uuid=${uuid}`
+          `/api/youtube/mp4?filename=${encodeURIComponent(filename)}&dl=${uuid}`
         );
       })
       .on("error", () => res.status(500).end());
