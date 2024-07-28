@@ -189,7 +189,7 @@ export type SearchOptions = {
   engine?: SearchEngine;
 };
 
-export type SearchTextOptions = SearchOptions & { url?: boolean };
+export type SearchTextOptions = SearchOptions & { url?: boolean; v2?: boolean };
 
 export function search(
   query: string,
@@ -234,7 +234,10 @@ export async function searchToText(
   queries: string | string[],
   options: SearchTextOptions = {}
 ) {
-  const { url: showUrl = false, ...searchOptions } = options;
+  const { url: showUrl = false, v2 = false, ...searchOptions } = options;
+  const { engine } = searchOptions;
+  if (!engine || (engine === "google" && v2))
+    return googleSearchToTextV2(queries);
   const results = await search(queries, searchOptions);
   return results
     .reduce((uniqued, curr) => {
