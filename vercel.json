@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "functions": {
     "api/**/*": {
-      "maxDuration": 60
+      "maxDuration": 900
     }
   },
   "headers": [
