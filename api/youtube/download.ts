@@ -14,16 +14,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     req.query["source"] ||
     req.body?.["source"];
   const id = req.query["id"] || req.body?.["id"];
-  const download = req.query["dl"] || req.body?.["dl"];
+  const uuid = req.query["uuid"] || req.body?.["uuid"];
+  let format = req.query["f"] || req.body?.["f"];
   let filename = req.query["filename"] || req.body?.["filename"];
 
   if (
-    download &&
-    typeof download === "string" &&
+    uuid &&
+    typeof uuid === "string" &&
     filename &&
     typeof filename !== "string"
   ) {
-    const filepath = `public/ytdl-cache/${download}/${filename}.mp4`;
+    const filepath = `public/ytdl-cache/${uuid}/${filename}.mp4`;
 
     if (!fs.existsSync(filepath) || !fs.statSync(filepath).isFile())
       return res.status(404).end();
@@ -49,8 +50,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     filename = info?.title;
   }
 
-  if (!filename.endsWith(".mp4")) filename += ".mp4";
+  if (typeof format === "string") format = format.toLowerCase();
+  if (format !== "mp3" || format !== "mp4") format = "mp3";
+
+  if (!filename.endsWith(`.${format}`)) filename += `.${format}`;
   filename = toSafeFilename(filename);
+
+  if (format === "mp3") {
+    try {
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${encodeURIComponent(filename)}"`
+      );
+      res.setHeader("Content-Type", "audio/mpeg");
+      YTDL.mp3(source).stream.pipe(res);
+    } catch {
+      res.status(500).end();
+    }
+    return;
+  }
 
   try {
     const uuid = crypto.randomUUID();
@@ -61,7 +79,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     YTDL.mp4(source, { output: cacheFilepath })
       .stream.on("close", () => {
         res.redirect(
-          `/api/youtube/mp4?filename=${encodeURIComponent(filename)}&dl=${uuid}`
+          `/api/youtube/mp4?filename=${encodeURIComponent(
+            filename
+          )}&uuid=${uuid}&f=mp4`
         );
       })
       .on("error", () => res.status(500).end());
