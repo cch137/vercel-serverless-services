@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import YouTubeDownloader from "../../services/ytdl.js";
+import YTDL from "../../services/ytdl.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!(req.method === "GET" || req.method === "POST"))
@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!source || typeof source !== "string") return res.status(400).end();
 
   try {
-    return res.json(await YouTubeDownloader.info(source));
+    return res.json(await YTDL.info(source));
   } catch (error) {
     res.status(500).json({ error });
   }
