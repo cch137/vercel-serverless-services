@@ -14,20 +14,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     req.query["source"] ||
     req.body?.["source"];
   const id = req.query["id"] || req.body?.["id"];
-  const uuid = req.query["uuid"] || req.body?.["uuid"];
+  const downloadId = req.query["d"] || req.body?.["d"];
   let format = req.query["f"] || req.body?.["f"];
   let filename = req.query["filename"] || req.body?.["filename"];
 
-  if (
-    uuid &&
-    typeof uuid === "string" &&
-    filename &&
-    typeof filename !== "string"
-  ) {
-    const filepath = `public/ytdl-cache/${uuid}/${filename}.mp4`;
+  if (downloadId && typeof downloadId === "string") {
+    const dirname = `public/ytdl-cache/${downloadId}/`;
 
-    if (!fs.existsSync(filepath) || !fs.statSync(filepath).isFile())
-      return res.status(404).end();
+    if (!fs.existsSync(dirname)) {
+      res.status(404).end();
+      return;
+    }
+
+    if (!filename || !fs.existsSync(dirname + filename)) {
+      filename = fs.readdirSync(dirname)[0];
+      if (!filename) {
+        res.status(404).end();
+        return;
+      }
+    }
 
     res.setHeader(
       "Content-Disposition",
@@ -35,7 +40,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     res.setHeader("Content-Type", "video/mp4");
 
-    fs.createReadStream(filepath).pipe(res);
+    fs.createReadStream(dirname + filename).pipe(res);
 
     return;
   }
@@ -51,19 +56,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (typeof format === "string") format = format.toLowerCase();
-  if (format !== "mp3" || format !== "mp4") format = "mp3";
 
   if (!filename.endsWith(`.${format}`)) filename += `.${format}`;
   filename = toSafeFilename(filename);
 
-  if (format === "mp3") {
+  if (format === "mp4") {
     try {
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${encodeURIComponent(filename)}"`
-      );
-      res.setHeader("Content-Type", "audio/mpeg");
-      YTDL.mp3(source).stream.pipe(res);
+      const uuid = crypto.randomUUID();
+      const cacheFilepath = `public/ytdl-cache/${uuid}/${filename}`;
+      try {
+        fs.mkdirSync(path.dirname(cacheFilepath), { recursive: true });
+      } catch {}
+      YTDL.mp4(source, { output: cacheFilepath })
+        .stream.on("close", () => {
+          res.redirect(`/api/youtube/download?d=${uuid}`);
+        })
+        .on("error", () => res.status(500).end());
     } catch {
       res.status(500).end();
     }
@@ -71,21 +79,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const uuid = crypto.randomUUID();
-    const cacheFilepath = `public/ytdl-cache/${uuid}/${filename}.mp4`;
-    try {
-      fs.mkdirSync(path.dirname(cacheFilepath), { recursive: true });
-    } catch {}
-    YTDL.mp4(source, { output: cacheFilepath })
-      .stream.on("close", () => {
-        res.redirect(
-          `/api/youtube/mp4?filename=${encodeURIComponent(
-            filename
-          )}&uuid=${uuid}&f=mp4`
-        );
-      })
-      .on("error", () => res.status(500).end());
-  } catch (error) {
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(filename)}"`
+    );
+    res.setHeader("Content-Type", "audio/mpeg");
+    YTDL.mp3(source).stream.pipe(res);
+  } catch {
     res.status(500).end();
   }
 }
