@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import YTDL from "../../services/ytdl";
-import { toSafeFilename } from "../../services/utils";
+import YTDL from "../../services/ytdl.js";
+import { toSafeFilename } from "../../services/utils.js";
 import path from "path";
 import fs from "fs";
 

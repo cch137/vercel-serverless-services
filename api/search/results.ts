@@ -1,6 +1,6 @@
-import { search, searchToText } from "../../services/search";
+import { search, searchToText } from "../../services/search.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Booleanish } from "../../services/utils";
+import { Booleanish } from "../../services/utils.js";
 
 export default async function searchResults(
   req: VercelRequest,

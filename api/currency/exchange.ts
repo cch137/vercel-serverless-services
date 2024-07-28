@@ -1,6 +1,6 @@
-import { exchangeCurrency } from "../../services/currency";
+import { exchangeCurrency } from "../../services/currency.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Booleanish } from "../../services/utils";
+import { Booleanish } from "../../services/utils.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

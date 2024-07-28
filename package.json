@@ -1,7 +1,8 @@
 {
+  "type": "module",
   "dependencies": {
-    "@cch137/read-stream": "^0.1.1",
-    "@cch137/ytdl": "^0.2.0",
+    "@cch137/read-stream": "^0.1.2",
+    "@cch137/ytdl": "^0.2.3",
     "@vercel/node": "^3.2.3",
     "cheerio": "^1.0.0-rc.12",
     "ffmpeg-static": "^5.2.0",
