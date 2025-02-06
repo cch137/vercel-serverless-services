@@ -1,18 +1,18 @@
 {
   "type": "module",
   "dependencies": {
-    "@cch137/read-stream": "^0.1.2",
-    "@cch137/ytdl": "^0.2.8",
-    "@vercel/node": "^3.2.8",
-    "cheerio": "^1.0.0-rc.12",
-    "ffmpeg-static": "^5.2.0",
-    "qs": "^6.13.0",
-    "typescript": "^5.5.4"
+    "@cch137/format-utils": "^0.1.2",
+    "@vercel/node": "^5.1.1",
+    "cheerio": "^1.0.0",
+    "path-to-regexp": "^8.2.0",
+    "qs": "^6.14.0",
+    "typescript": "^5.7.3",
+    "undici": "^7.3.0"
   },
   "devDependencies": {
-    "@types/node": "^22.1.0",
-    "@types/qs": "^6.9.15",
-    "vercel": "^35.2.3"
+    "@types/node": "^22.13.1",
+    "@types/qs": "^6.9.18",
+    "vercel": "^41.0.1"
   },
   "scripts": {
     "test": "vercel dev --listen 5000",

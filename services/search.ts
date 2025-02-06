@@ -1,25 +1,11 @@
 import { load as cheerioLoad } from "cheerio";
-import type { CheerioAPI, Element } from "cheerio";
+import type { CheerioAPI } from "cheerio";
+import type { Element } from "domhandler";
 import qs from "qs";
-import { readStream } from "@cch137/read-stream";
+import fetch2 from "@cch137/format-utils/fetch2";
 
 function isValidURL(url: string) {
   return /^https?:/.test(url);
-}
-
-async function proFetch(
-  input: string | URL | globalThis.Request,
-  init?: RequestInit
-) {
-  const res = await fetch(input, init);
-  const contentType = res.headers.get("content-type");
-  if (!contentType) return res;
-  const match = contentType.match(/charset=([^;]+)/i);
-  if (!match || match[1] === "utf-8") return res;
-  res.text = async () =>
-    new TextDecoder(match[1]).decode(await readStream(res.body));
-  res.json = async () => JSON.parse(await res.text());
-  return res;
 }
 
 // inspired by "googlethis"
@@ -34,7 +20,7 @@ export async function google(..._queries: (string[] | string)[]) {
     return (await Promise.all(queries.map((q) => google(q)))).flat();
   const query = queries[0];
 
-  const res = await proFetch(
+  const res = await fetch2(
     `https://www.google.com/search?q=${encodeURIComponent(query)}`
   );
   const $ = cheerioLoad(await res.text());
@@ -98,7 +84,7 @@ export async function googleSearchToTextV2(..._queries: (string[] | string)[]) {
     ).flat();
   const query = queries[0];
 
-  const res = await proFetch(`https://www.google.com/search?q=${query}`);
+  const res = await fetch2(`https://www.google.com/search?q=${query}`);
   const $ = cheerioLoad(await res.text());
   const items = [...$("#main").children("div")];
   const text = items
@@ -125,7 +111,7 @@ export async function duckduckgo(..._queries: (string[] | string)[]) {
   const timelimit = undefined;
   const safesearch = "off";
 
-  const res1 = await proFetch(
+  const res1 = await fetch2(
     `https://duckduckgo.com/?${qs.stringify({
       q: query,
       kl: region,
@@ -155,7 +141,7 @@ export async function duckduckgo(..._queries: (string[] | string)[]) {
     // o: "json",
   })}`;
 
-  const res = await proFetch(ddgSeaerchUrl);
+  const res = await fetch2(ddgSeaerchUrl);
 
   const regex = /DDG\.pageLayout\.load\('d',(\[.*?\])\);DDG\.duckbar\.load\(/;
   const matches = regex.exec(await res.text());
